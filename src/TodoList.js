@@ -1,96 +1,65 @@
-import React, { Component, Fragment } from 'react';
-import axios from 'axios'
-import './style.css'
-import TodoItem from './TodoItem'
+import React, { Component } from 'react'
+import 'antd/dist/antd.css';
+import { Input, Button, List } from 'antd';
+import store from './store'
+import { getHandleInputChangeAction, getHandleBtnClickAction, getHandleItemClickAction } from './store/actionCreator'
 
-class TodoList extends Component{
+export default class TodoList extends Component {
 
     constructor(props) {
-        super(props);
-        this.state = {
-            inputValue: '',
-            list: []
-        }
+        super(props)
+        this.state = store.getState();
+        console.log(store.getState())
         this.handleInputChange = this.handleInputChange.bind(this)
+        this.handleStoreChange = this.handleStoreChange.bind(this)
         this.handleBtnClick = this.handleBtnClick.bind(this)
-        this.handleItemDelete = this.handleItemDelete.bind(this)
+        store.subscribe(this.handleStoreChange)
     }
 
     render() {
         return (
-            <Fragment>
-                <div>
-                    <label htmlFor="insertArea">Enter event: </label>
-                    <input
-                        id={"insertArea"}
-                        className='input'
-                        value={this.state.inputValue}
-                        ref={(input) => {this.input = input}}
+            <div>
+                <div style={{marginTop: 10, marginLeft: 10}}>
+                    <Input 
+                        value={this.state.inputValue} 
+                        placeholder="What you want to do" 
+                        style={{width: 300, marginRight: 10}} 
                         onChange={this.handleInputChange}
-                    />
-                    <button onClick={this.handleBtnClick}>
+                        />
+                    <Button 
+                        type="primary"
+                        onClick={this.handleBtnClick}
+                        >
                         submit
-                    </button>
+                     </Button>
                 </div>
-                <ul ref={(ul) => {this.ul = ul}}>
-                    { this.getTodoItem()  }
-                </ul>
-            </Fragment>
-
+                <List
+                    style={{marginTop: 10, width: 300, marginLeft: 10}}
+                    bordered
+                    dataSource={this.state.list}
+                    renderItem={(item, index) => <List.Item onClick={this.handleItemClick.bind(this, index)}>{item}</List.Item>}
+                >
+                </List>
+            </div>
         )
     }
 
-    // 只会执行一次，把ajax请求放在这边
-    componentDidMount() {
-        axios.get('api/todolist')
-        .then((res) => {
-            this.setState(() => {
-                list: [...res.data]
-            })
-        })
-        .catch(() => {alert('error')})
+    handleInputChange(e) {
+        const action = getHandleInputChangeAction(e.target.value);
+        store.dispatch(action);
     }
 
-    getTodoItem() {
-        return this.state.list.map((item, index) => {
-            return (
-                <TodoItem
-                    key={index}
-                    content={item}
-                    index={index}
-                    deleteItem={this.handleItemDelete}
-                />
-                )
-            }
-        )
-    }
-
-    handleInputChange() {
-        const value = this.input.value;
-        this.setState(() => {
-            return {inputValue: value};
-        })
+    handleStoreChange() {
+        this.setState(store.getState)
     }
 
     handleBtnClick() {
-        // setState 异步执行，提升性能，后面可以接一个回调函数
-        this.setState((prevState) => ({
-            list: [...prevState.list, prevState.inputValue],
-            inputValue: ''
-        }), () => {
-            console.log(this.ul.querySelectorAll('div').length)
-        });
+        const action = getHandleBtnClickAction()
+        store.dispatch(action);
     }
 
-    handleItemDelete(index) {
-        // immutable
-        // change copy
-        this.setState((prevState) => {
-            const list = [...prevState.list];
-            list.splice(index, 1);
-            return {list: list};
-        });
+    handleItemClick(index) {
+        const action = getHandleItemClickAction(index)
+        store.dispatch(action)
     }
 }
-
-export default TodoList;
