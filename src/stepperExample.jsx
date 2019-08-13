@@ -4,6 +4,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table'
 
 export default class StepperExample extends Component {
@@ -138,38 +139,46 @@ export default class StepperExample extends Component {
     render() {
         const steps = this.getSteps();
         return (
-            <Fragment>
-                <Stepper activeStep={this.state.activeStep} alternativeLabel>
-                    {steps.map(label => (
-                    <Step key={label}>
-                        <StepLabel>{label}</StepLabel>
-                    </Step>
-                    ))}
-                </Stepper>
-                <div>
-                    {this.state.activeStep === steps.length ? (
+            <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
+                <Grid>
+                    <Grid>
+                        <Grid>
+                            <Stepper activeStep={this.state.activeStep} alternativeLabel>
+                                {steps.map(label => (
+                                <Step key={label}>
+                                    <StepLabel>{label}</StepLabel>
+                                </Step>
+                                ))}
+                            </Stepper>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Grid>
                     <div>
-                        <Typography>All steps completed</Typography>
-                        <Button onClick={this.handleReset}>Reset</Button>
-                    </div>
-                    ) : (
-                    <div>
-                        <div>{this.getStepContent(this.state.activeStep)}</div>
+                        {this.state.activeStep === steps.length ? (
                         <div>
-                        <Button
-                            disabled={this.state.activeStep === 0}
-                            onClick={this.handleBack}
-                        >
-                            Back
-                        </Button>
-                        <Button variant="contained" color="primary" onClick={this.handleNext}>
-                            {this.state.activeStep === steps.length - 1 ? 'Stage' : 'Upload'}
-                        </Button>
+                            <Typography>All steps completed</Typography>
+                            <Button onClick={this.handleReset}>Reset</Button>
                         </div>
+                        ) : (
+                        <div>
+                            <div>{this.getStepContent(this.state.activeStep)}</div>
+                            <div>
+                            <Button
+                                disabled={this.state.activeStep === 0}
+                                onClick={this.handleBack}
+                            >
+                                Back
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={this.handleNext}>
+                                {this.state.activeStep === steps.length - 1 ? 'Stage' : 'Upload'}
+                            </Button>
+                            </div>
+                        </div>
+                        )}
                     </div>
-                    )}
-                </div>
-            </Fragment>
+                </Grid>
+            </Grid>
         );
     }
 }
